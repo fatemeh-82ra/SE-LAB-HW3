@@ -66,6 +66,21 @@ public class AccountBalanceCalculatorTest {
         assertTrue(history.isEmpty(), "Transaction history should be empty before calculating balance");
     }
 
+    @Test
+    void testWithdrawalExceedingBalanceShouldBeIgnored() {
+        // Arrange: A list of transactions where withdrawal is more than the balance
+        List<Transaction> transactions = Arrays.asList(
+                new Transaction(TransactionType.DEPOSIT, 100),
+                new Transaction(TransactionType.WITHDRAWAL, 150)
+        );
+
+        // Act: Calculate the balance
+        int balance = AccountBalanceCalculator.calculateBalance(transactions);
+
+        // Assert: The balance should remain 100, as the invalid withdrawal is ignored.
+        assertEquals(100, balance);
+    }
+
 //    @Test
 //    void testTransactionHistoryAfterDeposits() {
 //        // Perform deposits
