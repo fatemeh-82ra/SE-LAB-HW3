@@ -39,8 +39,7 @@ void testWithdrawalExceedingBalanceShouldBeIgnored() {
 ```
 
 هنگامی که این تست بر روی کد اصلی اجرا می‌شود، همانطور که انتظار می‌رود، ناموفق است.
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0b62b19f-6e47-4a4d-8a59-4d8b52e34ea4" />
+<img width="1920" height="993" alt="Screenshot (2513)" src="https://github.com/user-attachments/assets/8283ef44-4940-455d-987f-1d77d8d3acd1" />
 
 #### رفع خطا (مرحله «سبز»)
 
@@ -66,8 +65,7 @@ public static int calculateBalance(List<Transaction> transactions) {
 ```
 
 پس از اعمال این اصلاح، تمام تست‌ها، از جمله تست جدید، با موفقیت پاس می‌شوند.
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/48e04d1d-4695-487a-ac7e-135cc993801b" />
+<img width="1920" height="1000" alt="Screenshot (2514)" src="https://github.com/user-attachments/assets/dce7c674-915c-4f17-b4f0-316330e55541" />
 
 
 ### پرسش سوم: مشکلات نوشتن تست پس از کدنویسی
