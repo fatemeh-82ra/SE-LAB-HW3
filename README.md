@@ -120,7 +120,43 @@ public static int calculateBalance(List<Transaction> transactions) {
 <img width="1458" height="608" alt="image" src="https://github.com/user-attachments/assets/8ddb6f23-4af9-4163-8383-1437f767a144" />
 
 
+#### مورد آزمون سوم:
+@Test
+    void testTransactionHistoryShouldContainOnlyLastCalculationTransactions() {
+//        // Perform first calculation with some transactions
+        List<Transaction> firstTransactions = Arrays.asList(
+                new Transaction(TransactionType.DEPOSIT, 100),
+                new Transaction(TransactionType.WITHDRAWAL, 50)
+        );
 
+        AccountBalanceCalculator.calculateBalance(firstTransactions);
+//
+//        // Ensure the transaction history contains the correct transactions from the first calculation
+       List<Transaction> historyAfterFirstCalc = AccountBalanceCalculator.getTransactionHistory();
+        assertEquals(2, historyAfterFirstCalc.size(), "Transaction history should contain 2 transactions after the first calculation");
+        assertTrue(historyAfterFirstCalc.containsAll(firstTransactions), "Transaction history should contain the first set of transactions");
+//
+//        // Perform second calculation with different transactions
+        List<Transaction> secondTransactions = Arrays.asList(
+                new Transaction(TransactionType.DEPOSIT, 200),
+                new Transaction(TransactionType.WITHDRAWAL, 150)
+        );
+//
+        AccountBalanceCalculator.calculateBalance(secondTransactions);
+//
+//        // Ensure the transaction history only contains transactions from the second calculation
+        List<Transaction> historyAfterSecondCalc = AccountBalanceCalculator.getTransactionHistory();
+        assertEquals(2, historyAfterSecondCalc.size(), "Transaction history should contain 2 transactions after the second calculation");
+        assertTrue(historyAfterSecondCalc.containsAll(secondTransactions), "Transaction history should contain the second set of transactions");
+        assertFalse(historyAfterSecondCalc.containsAll(firstTransactions), "Transaction history should not contain the first set of transactions after the second calculation");
+    }
+}
+
+هنگامی که این تست بر روی کد اصلی اجرا می‌شود، همانطور که انتظار می‌رود، ناموفق است.
+
+![IMG_7445 png](https://github.com/user-attachments/assets/9fc9f389-e725-4b09-a1eb-40257c6bb0df)
+
+#### رفع خطا:
 ### پرسش سوم: مشکلات نوشتن تست پس از کدنویسی
 
 نوشتن تست پس از کدنویسی می‌تواند منجر به یک سوگیری ناخودآگاه شود که در آن، تست‌ها برای تأیید رفتار موجود کد نوشته می‌شوند، نه برای به چالش کشیدن الزامات آن. این موضوع اغلب باعث نادیده گرفتن موارد مرزی و خطاها می‌شود، همانطور که در مجموعه تست اولیه این آزمایشگاه مشاهده شد. همچنین، شناسایی تأثیر دقیق یک تغییر در کد را دشوارتر می‌کند، زیرا هیچ تست ناموفق اولیه‌ای برای تأیید وجود خطا وجود ندارد.
