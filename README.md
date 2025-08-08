@@ -116,58 +116,8 @@ public static int calculateBalance(List<Transaction> transactions) {
 بنابراین شاهد پاس شدن تست مذکور هستیم:
 <img width="1432" height="659" alt="image" src="https://github.com/user-attachments/assets/5f5e238d-a8f4-4029-af1c-78cf469d10eb" />
 
-#### مورد آزمون جدید برای آشکارسازی خطا (مرحله «قرمز»)
-
-تابع حال حاضر، تراکنش های ناموفق را نیز به لیست تراکنش ها اضافه می کند و موجودی حساب دچار اختلال می شود. لذا تست زیر را به برنامه اضافه می کنیم:
-```java
-@Test
-    void testFailedWithdrawalNotAddedToHistory() {
-        AccountBalanceCalculator.clearTransactionHistory();
-
-        List<Transaction> initialDeposit = List.of(
-                new Transaction(TransactionType.DEPOSIT, 100));
-        AccountBalanceCalculator.calculateBalance(initialDeposit);
-
-        Transaction failedWithdrawal = new Transaction(TransactionType.WITHDRAWAL, 200);
-        List<Transaction> secondBatch = List.of(failedWithdrawal);
-        AccountBalanceCalculator.calculateBalance(secondBatch);
-
-        List<Transaction> history = AccountBalanceCalculator.getTransactionHistory();
-
-        assertFalse(history.contains(failedWithdrawal),
-                "Transaction history should not contain failed withdrawal transactions");
-    }
-```
-مشاهده می کنیم که در ابتدا این تست fail می شود
-<img width="1630" height="667" alt="image" src="https://github.com/user-attachments/assets/bc2e2ab9-9ad4-4bd9-8a42-782d71c4dc8b" />
-
-#### رفع خطا (مرحله «سبز»)
-برای رفع خطا، متد `calculateBalance` در فایل `AccountBalanceCalculator.java` طوری تغییر داده شد که لیست تراکنش ها را با بررسی تراکنش های ناموفق به روزرسانی کند.
-``` java
-public static int calculateBalance(List<Transaction> transactions) {
-
-        // FIX: Only add successful transactions to the history
-        // Currently all transactions are added, even failed withdrawals
-        int balance = 0;
-
-        for (Transaction t : transactions) {
-            if (t.getType() == TransactionType.DEPOSIT) {
-                balance += t.getAmount();
-                transactionHistory.add(t); // Deposit is always successful
-            } else if (t.getType() == TransactionType.WITHDRAWAL) {
-                // FIX: Only subtract and record withdrawal if the balance is sufficient
-                if (balance >= t.getAmount()) {
-                    balance -= t.getAmount();
-                    transactionHistory.add(t); // Record successful withdrawal
-                }
-                // If balance is insufficient, do not add the transaction to history
-            }
-        }
-        return balance;
-    }
-```
-حال مشاهده می شود که به درستی تست پاس می شود.
-<img width="1507" height="657" alt="image" src="https://github.com/user-attachments/assets/a321be05-8640-4432-859f-e6eed5eb4d79" />
+پس از انجام تغییرات بالا مشاهده می شود که تست بعدی که تاثیر نوع تراکنش بر ثبت آن در تاریخچه را بررسی می کند نیز پاس می شود
+<img width="1458" height="608" alt="image" src="https://github.com/user-attachments/assets/8ddb6f23-4af9-4163-8383-1437f767a144" />
 
 
 
