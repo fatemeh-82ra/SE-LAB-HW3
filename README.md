@@ -67,6 +67,109 @@ public static int calculateBalance(List<Transaction> transactions) {
 پس از اعمال این اصلاح، تمام تست‌ها، از جمله تست جدید، با موفقیت پاس می‌شوند.
 <img width="1920" height="1000" alt="Screenshot (2514)" src="https://github.com/user-attachments/assets/dce7c674-915c-4f17-b4f0-316330e55541" />
 
+#### مورد آزمون جدید برای آشکارسازی خطا (مرحله «قرمز»)
+خطای بعدی در تاریخچه تراکنش ها دیده میشه که تست زیر اون رو بررسی می کنه، درواقع این تست بررسی می‌کند که وقتی چند تراکنش واریز انجام می‌ شود، متد محاسبه موجودی باید آن‌ها را درست و کامل در تاریخچه ذخیره کند.
+```java
+@Test
+   void testTransactionHistoryAfterDeposits() {
+       // Perform deposits
+       List<Transaction> transactions = Arrays.asList(
+               new Transaction(TransactionType.DEPOSIT, 100),
+               new Transaction(TransactionType.DEPOSIT, 200)
+       );
+
+       // Calculate balance, which will also add transactions to the history
+       AccountBalanceCalculator.calculateBalance(transactions);
+
+       // Ensure the transaction history contains the correct transactions
+       List<Transaction> history = AccountBalanceCalculator.getTransactionHistory();
+       assertEquals(2, history.size(), "Transaction history should contain 2 transactions");
+
+       // Check if the transactions are correctly recorded
+       assertTrue(history.containsAll(transactions), "Transaction history should contain both deposit transactions");
+   }
+```
+هنگامی که این تست بر روی کد اصلی اجرا می‌شود، همانطور که انتظار می‌رود، ناموفق است.
+<img width="1652" height="736" alt="image" src="https://github.com/user-attachments/assets/2fd1a7d0-ec48-411a-8eb2-a2c08b1675dc" />
+#### رفع خطا (مرحله «سبز»)
+برای رفع خطا، متد `calculateBalance` در فایل `AccountBalanceCalculator.java` طوری تغییر داده شد که لیست تراکنش ها را به روزرسانی کند.
+```java
+public static int calculateBalance(List<Transaction> transactions) {
+
+        // FIX: Ensure transaction history is updated with the new transactions
+        transactionHistory.addAll(transactions);
+
+        int balance = 0;
+        for (Transaction t : transactions) {
+            if (t.getType() == TransactionType.DEPOSIT) {
+                balance += t.getAmount();
+            } else if (t.getType() == TransactionType.WITHDRAWAL) {
+                // FIX: Only subtract if the balance is sufficient
+                if (balance >= t.getAmount()) {
+                    balance -= t.getAmount();
+                }
+            }
+        }
+        return balance;
+    }
+```
+بنابراین شاهد پاس شدن تست مذکور هستیم:
+<img width="1432" height="659" alt="image" src="https://github.com/user-attachments/assets/5f5e238d-a8f4-4029-af1c-78cf469d10eb" />
+
+#### مورد آزمون جدید برای آشکارسازی خطا (مرحله «قرمز»)
+
+تابع حال حاضر، تراکنش های ناموفق را نیز به لیست تراکنش ها اضافه می کند و موجودی حساب دچار اختلال می شود. لذا تست زیر را به برنامه اضافه می کنیم:
+```java
+@Test
+    void testFailedWithdrawalNotAddedToHistory() {
+        AccountBalanceCalculator.clearTransactionHistory();
+
+        List<Transaction> initialDeposit = List.of(
+                new Transaction(TransactionType.DEPOSIT, 100));
+        AccountBalanceCalculator.calculateBalance(initialDeposit);
+
+        Transaction failedWithdrawal = new Transaction(TransactionType.WITHDRAWAL, 200);
+        List<Transaction> secondBatch = List.of(failedWithdrawal);
+        AccountBalanceCalculator.calculateBalance(secondBatch);
+
+        List<Transaction> history = AccountBalanceCalculator.getTransactionHistory();
+
+        assertFalse(history.contains(failedWithdrawal),
+                "Transaction history should not contain failed withdrawal transactions");
+    }
+```
+مشاهده می کنیم که در ابتدا این تست fail می شود
+<img width="1630" height="667" alt="image" src="https://github.com/user-attachments/assets/bc2e2ab9-9ad4-4bd9-8a42-782d71c4dc8b" />
+
+#### رفع خطا (مرحله «سبز»)
+برای رفع خطا، متد `calculateBalance` در فایل `AccountBalanceCalculator.java` طوری تغییر داده شد که لیست تراکنش ها را با بررسی تراکنش های ناموفق به روزرسانی کند.
+``` java
+public static int calculateBalance(List<Transaction> transactions) {
+
+        // FIX: Only add successful transactions to the history
+        // Currently all transactions are added, even failed withdrawals
+        int balance = 0;
+
+        for (Transaction t : transactions) {
+            if (t.getType() == TransactionType.DEPOSIT) {
+                balance += t.getAmount();
+                transactionHistory.add(t); // Deposit is always successful
+            } else if (t.getType() == TransactionType.WITHDRAWAL) {
+                // FIX: Only subtract and record withdrawal if the balance is sufficient
+                if (balance >= t.getAmount()) {
+                    balance -= t.getAmount();
+                    transactionHistory.add(t); // Record successful withdrawal
+                }
+                // If balance is insufficient, do not add the transaction to history
+            }
+        }
+        return balance;
+    }
+```
+حال مشاهده می شود که به درستی تست پاس می شود.
+<img width="1507" height="657" alt="image" src="https://github.com/user-attachments/assets/a321be05-8640-4432-859f-e6eed5eb4d79" />
+
+
 
 ### پرسش سوم: مشکلات نوشتن تست پس از کدنویسی
 
