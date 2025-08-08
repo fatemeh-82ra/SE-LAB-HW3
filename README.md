@@ -159,10 +159,14 @@ public static int calculateBalance(List<Transaction> transactions) {
 
 #### رفع خطا:
 
-برای رفع خطا، باید قبل از خط // FIX: Ensure transaction history is updated with the new transactionstransactionHistory.addAll(transactions);
+برای رفع خطا، باید قبل از خط
+```java
+// FIX: Ensure transaction history is updated with the new transactionstransactionHistory.addAll(transactions);
+```
 این کد را بگذاریم:
+```java
 clearTransactionHistory();
-
+```
 پس از اعمال این تغییر، شاهد پاس شدن تست هستیم:
 ![IMG_7447 png](https://github.com/user-attachments/assets/5871c179-9594-4cfe-8cc1-fbd2f56afd7c)
 
