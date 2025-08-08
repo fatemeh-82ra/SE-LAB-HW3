@@ -121,6 +121,7 @@ public static int calculateBalance(List<Transaction> transactions) {
 
 
 #### مورد آزمون سوم:
+```java
 @Test
     void testTransactionHistoryShouldContainOnlyLastCalculationTransactions() {
 //        // Perform first calculation with some transactions
@@ -151,12 +152,20 @@ public static int calculateBalance(List<Transaction> transactions) {
         assertFalse(historyAfterSecondCalc.containsAll(firstTransactions), "Transaction history should not contain the first set of transactions after the second calculation");
     }
 }
-
+```
 هنگامی که این تست بر روی کد اصلی اجرا می‌شود، همانطور که انتظار می‌رود، ناموفق است.
 
 ![IMG_7445 png](https://github.com/user-attachments/assets/9fc9f389-e725-4b09-a1eb-40257c6bb0df)
 
 #### رفع خطا:
+
+برای رفع خطا، باید قبل از خط // FIX: Ensure transaction history is updated with the new transactionstransactionHistory.addAll(transactions);
+این کد را بگذاریم:
+clearTransactionHistory();
+
+پس از اعمال این تغییر، شاهد پاس شدن تست هستیم:
+![IMG_7447 png](https://github.com/user-attachments/assets/5871c179-9594-4cfe-8cc1-fbd2f56afd7c)
+
 ### پرسش سوم: مشکلات نوشتن تست پس از کدنویسی
 
 نوشتن تست پس از کدنویسی می‌تواند منجر به یک سوگیری ناخودآگاه شود که در آن، تست‌ها برای تأیید رفتار موجود کد نوشته می‌شوند، نه برای به چالش کشیدن الزامات آن. این موضوع اغلب باعث نادیده گرفتن موارد مرزی و خطاها می‌شود، همانطور که در مجموعه تست اولیه این آزمایشگاه مشاهده شد. همچنین، شناسایی تأثیر دقیق یک تغییر در کد را دشوارتر می‌کند، زیرا هیچ تست ناموفق اولیه‌ای برای تأیید وجود خطا وجود ندارد.
