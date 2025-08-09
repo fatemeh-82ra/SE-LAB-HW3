@@ -10,6 +10,8 @@ public class AccountBalanceCalculator {
     // Method to calculate balance based on transactions
     public static int calculateBalance(List<Transaction> transactions) {
 
+        clearTransactionHistory();
+
         // FIX: Ensure transaction history is updated with the new transactions
         transactionHistory.addAll(transactions);
 
